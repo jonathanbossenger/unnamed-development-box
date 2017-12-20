@@ -4,45 +4,16 @@
 # =            VARIABLES            =
 # =================================*/
 INSTALL_NGINX_INSTEAD=0
+PROJECT_NAME=localbox
 WELCOME_MESSAGE='
-MMMMMMMMMMMMMMMXl..........................cXMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMK:.::....................;c.:KMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMM0:.lc....................:l,;0MMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMO;.l:....................;l,,OMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMWx.;l;....................,l:.dWMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMNl.:l......................lc.lXMMMMMMMMMMMMMM
-MMMMMMMMMMMMMM0;.lc......................:l,;OMMMMMMMMMMMMMM
-MMMMMMMMMMMMMNd.;o;......................,l:.oNMMMMMMMMMMMMM
-MMMMMMMMMMMMM0;.lc........................:l.;OMMMMMMMMMMMMM
-MMMMMMMMMMMMNo.:l,.........................lc.lXMMMMMMMMMMMM
-MMMMMMMMMMMWO,.lc..........................:l,,kWMMMMMMMMMMM
-MMMMMMMMMMMXl.:l.....................;:::,..lc.cXMMMMMMMMMMM
-MMMMMMMMMMMO,,l:..................,codxxxdc.;l;,kWMMMMMMMMMM
-MMMMMMMMMMNd.:l,..,cloolc;......;ldxxxxxxxd:,lc.oNMMMMMMMMMM
-MMMMMMMMMMNl.cl..lOKKKKK0Oxl;;:ldxxxxxxxxxxc.cl.cXMMMMMMMMMM
-MMMMMMMMMMXl.cl.:OKKKKKKK0Oxooodxxxxxxxxxxxc.cl.cXMMMMMMMMMM
-MMMMMMMMMMNd.;l,,dO0000Okdolllllodxxxxxxxxo,,l:.oNMMMMMMMMMM
-MMMMMMMMMMM0:.cl.,ldddolllllllllllodxxxxxo;.cl.;OMMMMMMMMMMM
-MMMMMMMMMMMWO;.cl,,:clllllllllllllllloooc,,cl,,kWMMMMMMMMMMM
-MMMMMMMMMMMMW0:.:l:,,:cllllllllllllllc:,,:l:.:OWMMMMMMMMMMMM
-MMMMMMMMMMMMMMXd;,:c:;,,;:cccccccc:;,,,:cc,,oKWMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMWKd;,:dkdl:;;;,,,;;:coxdc,;o0WMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMWO;.lXMWNXK00000KNWMNd.;kWMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMXo.;OWMMMMMMMMMMMMMMMKc.lXMMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMNo.;OWMMMMMMMMMMMMMMMMM0:.lXMMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMNd.;kWMMMMMMMMMMMMMMMMMMM0:.oNMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMK:.oNMMMMMMMMMMMMMMMMMMMMWx.;0MMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMXl.:kXNWMMMMMMMMMMMMMMWWXOc.cXMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMXx:;;:clooddddddddoolc:;;:dKWMMMMMMMMMMMMMMM
-MMMMMMMMMMMMMMMMMWXOdl:;,,.........,;:cdkXWMMMMMMMMMMMMMMMMM
-  ______                      _        ______                ______
- / _____)            _       | |      (____  \              (_____ \
-( (____   ____ ___ _| |_ ____| |__     ____)  ) ___ _   _    _____) )___ ___
- \____ \ / ___) _ (_   _) ___)  _ \   |  __  ( / _ ( \ / )  |  ____/ ___) _ \
- _____) | (__| |_| || |( (___| | | |  | |__)  ) |_| ) X (   | |   | |  | |_| |
-(______/ \____)___/  \__)____)_| |_|  |______/ \___(_/ \_)  |_|   |_|   \___/
+______               ______
+| ___ \              | ___ \
+| |_/ / ___  ___ ___ | |_/ / _____  __
+| ___ \/ _ \/ __/ __|| ___ \/ _ \ \/ /
+| |_/ / (_) \__ \__ \| |_/ / (_) >  <
+\____/ \___/|___/___/\____/ \___/_/\_\
 
-For help, please visit box.scotch.io or scotch.io. Follow us on Twitter @scotch_io and @whatnicktweets.
+For help, please visit box.jonathanbossenger.com Follow me on Twitter at @jon_bossenger.
 '
 
 reboot_webserver_helper() {
@@ -88,8 +59,8 @@ if [ $INSTALL_NGINX_INSTEAD != 1 ]; then
     # Install the package
     sudo apt-get -y install apache2
 
-    # Remove "html" and add public
-    mv /var/www/html /var/www/public
+    # Remove "/var/www/html"
+    sudo rm -rf /var/www/html
 
     # Clean VHOST with full permissions
     MY_WEB_CONFIG='<VirtualHost *:80>
@@ -106,7 +77,7 @@ if [ $INSTALL_NGINX_INSTEAD != 1 ]; then
     echo "$MY_WEB_CONFIG" | sudo tee /etc/apache2/sites-available/000-default.conf
 
     # Squash annoying FQDN warning
-    echo "ServerName scotchbox" | sudo tee /etc/apache2/conf-available/servername.conf
+    echo "ServerName $PROJECT_NAME" | sudo tee /etc/apache2/conf-available/servername.conf
     sudo a2enconf servername
 
     # Enabled missing h5bp modules (https://github.com/h5bp/server-configs-apache)
@@ -136,7 +107,7 @@ if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
     sudo systemctl enable nginx
 
     # Remove "html" and add public
-    mv /var/www/html /var/www/public
+    sudo rm -rf /var/www/html
 
     # Make sure your web server knows you did this...
     MY_WEB_CONFIG='server {
@@ -295,7 +266,7 @@ fi
 echo 'display_startup_errors = On' | sudo tee -a $PHP_USER_INI_PATH
 echo 'display_errors = On' | sudo tee -a $PHP_USER_INI_PATH
 echo 'error_reporting = E_ALL' | sudo tee -a $PHP_USER_INI_PATH
-echo 'short_open_tag = On' | sudo tee -a $PHP_USER_INI_PATH
+#echo 'short_open_tag = On' | sudo tee -a $PHP_USER_INI_PATH
 reboot_webserver_helper
 
 # Disable PHP Zend OPcache
@@ -308,7 +279,6 @@ else
     sudo sed -i s,\;opcache.enable=0,opcache.enable=0,g /etc/php/7.0/apache2/php.ini
 fi
 reboot_webserver_helper
-
 
 
 
@@ -332,10 +302,10 @@ reboot_webserver_helper
 # /*=============================
 # =            MYSQL            =
 # =============================*/
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password root'
-sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password root'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password password'
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password password'
 sudo apt-get -y install mysql-server
-sudo mysqladmin -uroot -proot create scotchbox
+sudo mysqladmin -uroot -ppassword create $PROJECT_NAME
 sudo apt-get -y install php-mysql
 reboot_webserver_helper
 
@@ -345,77 +315,26 @@ reboot_webserver_helper
 
 
 
+# /*=============================
+# =            PHPMyAdmin       =
+# =============================*/
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean true"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password password"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password password"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password password"
+sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
 
-# /*=================================
-# =            PostreSQL            =
-# =================================*/
-sudo apt-get -y install postgresql postgresql-contrib
-echo "CREATE ROLE root WITH LOGIN ENCRYPTED PASSWORD 'root';" | sudo -i -u postgres psql
-sudo -i -u postgres createdb --owner=root scotchbox
-sudo apt-get -y install php-pgsql
-reboot_webserver_helper
+# Use nijel/phpmyadmin ppa to prevent deprecation errors
+sudo add-apt-repository -y ppa:nijel/phpmyadmin
+sudo apt update
+sudo apt install phpmyadmin
 
-
-
-
-
-
-
-# /*==============================
-# =            SQLITE            =
-# ===============================*/
-sudo apt-get -y install sqlite
-sudo apt-get -y install php-sqlite3
-reboot_webserver_helper
-
-
-
-
-
-
-
-# /*===============================
-# =            MONGODB            =
-# ===============================*/
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
-echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
-sudo apt-get update
-sudo apt-get install -y mongodb-org
-
-sudo tee /lib/systemd/system/mongod.service  <<EOL
-[Unit]
-Description=High-performance, schema-free document-oriented database
-After=network.target
-Documentation=https://docs.mongodb.org/manual
-
-[Service]
-User=mongodb
-Group=mongodb
-ExecStart=/usr/bin/mongod --quiet --config /etc/mongod.conf
-
-[Install]
-WantedBy=multi-user.target
-EOL
-sudo systemctl enable mongod
-sudo service mongod start
-
-# Enable it for PHP
-sudo pecl install mongodb
-sudo apt-get install -y php-mongodb
-if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
-    echo 'extension = mongo.so' | sudo tee -a /etc/php/7.0/fpm/conf.d/user.ini
-else
-    echo 'extension = mongo.so' | sudo tee -a /etc/php/7.0/apache2/conf.d/user.ini
+if [ $INSTALL_NGINX_INSTEAD == 1 ];
+then
+    ##@todo nginx specific settings
+    echo 'Configuration for nginx goes here'
 fi
-
 reboot_webserver_helper
-
-
-
-
-
-
-
 
 
 
@@ -441,37 +360,12 @@ sudo chmod 755 /usr/local/bin/composer
 
 
 
-# /*==================================
-# =            BEANSTALKD            =
-# ==================================*/
-sudo apt-get -y install beanstalkd
-
-
-
-
-
-
-
 # /*==============================
 # =            WP-CLI            =
 # ==============================*/
 curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 sudo chmod +x wp-cli.phar
 sudo mv wp-cli.phar /usr/local/bin/wp
-
-
-
-
-
-
-
-
-# /*=============================
-# =            DRUSH            =
-# =============================*/
-wget http://files.drush.org/drush.phar
-sudo chmod +x drush.phar
-sudo mv drush.phar /usr/local/bin/drush
 
 
 
@@ -519,74 +413,12 @@ sudo npm install -g webpack
 
 
 
-# /*============================
-# =            YARN            =
-# ============================*/
-curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-sudo apt-get update
-sudo apt-get -y install yarn
-
-
-
-
-
-
-
-
-# /*============================
-# =            RUBY            =
-# ============================*/
-sudo apt-get -y install ruby
-sudo apt-get -y install ruby-dev
-
-# Use RVM though to make life easy
-gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
-\curl -sSL https://get.rvm.io | bash -s stable
-source ~/.rvm/scripts/rvm
-rvm install 2.4.1
-rvm use 2.4.1
-
-
-
-
-
-
-
-
-# /*=============================
-# =            REDIS            =
-# =============================*/
-sudo apt-get -y install redis-server
-sudo apt-get -y install php-redis
-reboot_webserver_helper
-
-
-
-
-
-
-
 # /*=================================
 # =            MEMCACHED            =
 # =================================*/
 sudo apt-get -y install memcached
 sudo apt-get -y install php-memcached
 reboot_webserver_helper
-
-
-
-
-
-
-
-
-# /*==============================
-# =            GOLANG            =
-# ==============================*/
-sudo add-apt-repository -y ppa:longsleep/golang-backports
-sudo apt-get update
-sudo apt-get -y install golang-go
 
 
 
@@ -664,4 +496,4 @@ echo "$WELCOME_MESSAGE" | sudo tee /etc/motd
 # /*====================================
 # =            YOU ARE DONE            =
 # ====================================*/
-echo 'Booooooooom! We are done. You are a hero. I love you.'
+echo 'Boom! You are done.'
