@@ -327,7 +327,7 @@ sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver mul
 # Use nijel/phpmyadmin ppa to prevent deprecation errors
 sudo add-apt-repository -y ppa:nijel/phpmyadmin
 sudo apt update
-sudo apt install phpmyadmin
+sudo apt install -y phpmyadmin
 
 if [ $INSTALL_NGINX_INSTEAD == 1 ];
 then
@@ -419,6 +419,19 @@ sudo npm install -g webpack
 sudo apt-get -y install memcached
 sudo apt-get -y install php-memcached
 reboot_webserver_helper
+
+
+
+
+
+
+
+# /*==============================
+# =            GOLANG            =
+# ==============================*/
+sudo add-apt-repository -y ppa:longsleep/golang-backports
+sudo apt-get update
+sudo apt-get -y install golang-go
 
 
 
