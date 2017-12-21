@@ -4,14 +4,15 @@
 # =            VARIABLES            =
 # =================================*/
 INSTALL_NGINX_INSTEAD=0
-PROJECT_NAME=localbox
+PROJECT_NAME=bossbox-lamp
 WELCOME_MESSAGE='
-______               ______
-| ___ \              | ___ \
-| |_/ / ___  ___ ___ | |_/ / _____  __
-| ___ \/ _ \/ __/ __|| ___ \/ _ \ \/ /
-| |_/ / (_) \__ \__ \| |_/ / (_) >  <
-\____/ \___/|___/___/\____/ \___/_/\_\
+______               ______              ___       ___  ___  ___________
+| ___ \              | ___ \            / / |     / _ \ |  \/  || ___ \ \
+| |_/ / ___  ___ ___ | |_/ / _____  __ | || |    / /_\ \| .  . || |_/ /| |
+| ___ \/ _ \/ __/ __|| ___ \/ _ \ \/ / | || |    |  _  || |\/| ||  __/ | |
+| |_/ / (_) \__ \__ \| |_/ / (_) >  <  | || |____| | | || |  | || |    | |
+\____/ \___/|___/___/\____/ \___/_/\_\ | |\_____/\_| |_/\_|  |_/\_|    | |
+                                        \_\                           /_/
 
 For help, please visit box.jonathanbossenger.com Follow me on Twitter at @jon_bossenger.
 '
@@ -263,14 +264,14 @@ else
     PHP_USER_INI_PATH=/etc/php/7.0/apache2/conf.d/user.ini
 fi
 
-echo 'display_startup_errors = On' | sudo tee -a $PHP_USER_INI_PATH
-echo 'display_errors = On' | sudo tee -a $PHP_USER_INI_PATH
-echo 'error_reporting = E_ALL' | sudo tee -a $PHP_USER_INI_PATH
-#echo 'short_open_tag = On' | sudo tee -a $PHP_USER_INI_PATH
+echo 'display_startup_errors=On' | sudo tee -a $PHP_USER_INI_PATH
+echo 'display_errors=On' | sudo tee -a $PHP_USER_INI_PATH
+echo 'error_reporting=E_ALL' | sudo tee -a $PHP_USER_INI_PATH
+echo 'upload_max_filesize=16M' | sudo tee -a $PHP_USER_INI_PATH
 reboot_webserver_helper
 
 # Disable PHP Zend OPcache
-echo 'opache.enable = 0' | sudo tee -a $PHP_USER_INI_PATH
+echo 'opache.enable=0' | sudo tee -a $PHP_USER_INI_PATH
 
 # Absolutely Force Zend OPcache off...
 if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
@@ -305,7 +306,6 @@ reboot_webserver_helper
 sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password password'
 sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password password'
 sudo apt-get -y install mysql-server
-sudo mysqladmin -uroot -ppassword create $PROJECT_NAME
 sudo apt-get -y install php-mysql
 reboot_webserver_helper
 
