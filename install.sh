@@ -3,7 +3,22 @@
 # /*=================================
 # =            VARIABLES            =
 # =================================*/
-INSTALL_NGINX_INSTEAD=0
+INSTALL_NGINX_INSTEAD=1
+
+if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
+PROJECT_NAME=bossbox-lemp
+WELCOME_MESSAGE='
+______               ______              ___      ________  ___________
+| ___ \              | ___ \            / / |    |  ___|  \/  || ___ \ \
+| |_/ / ___  ___ ___ | |_/ / _____  __ | || |    | |__ | .  . || |_/ /| |
+| ___ \/ _ \/ __/ __|| ___ \/ _ \ \/ / | || |    |  __|| |\/| ||  __/ | |
+| |_/ / (_) \__ \__ \| |_/ / (_) >  <  | || |____| |___| |  | || |    | |
+\____/ \___/|___/___/\____/ \___/_/\_\ | |\_____/\____/\_|  |_/\_|    | |
+                                        \_\                          /_/
+
+For help, please visit box.jonathanbossenger.com Follow me on Twitter at @jon_bossenger.
+'
+else
 PROJECT_NAME=bossbox-lamp
 WELCOME_MESSAGE='
 ______               ______              ___       ___  ___  ___________
@@ -16,6 +31,8 @@ ______               ______              ___       ___  ___  ___________
 
 For help, please visit box.jonathanbossenger.com Follow me on Twitter at @jon_bossenger.
 '
+fi
+
 
 reboot_webserver_helper() {
 
@@ -30,7 +47,6 @@ reboot_webserver_helper() {
 
     echo 'Rebooting your webserver'
 }
-
 
 
 
@@ -121,7 +137,7 @@ if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
         server_name _;
 
         location / {
-            try_files $uri $uri/ =404;
+            try_files $uri $uri/ /index.php?$args;
         }
     }'
     echo "$MY_WEB_CONFIG" | sudo tee /etc/nginx/sites-available/default
@@ -180,7 +196,7 @@ if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
         server_name _;
 
         location / {
-            try_files $uri $uri/ =404;
+            try_files $uri $uri/ /index.php?$args;
         }
 
         location ~ \.php$ {
@@ -332,7 +348,7 @@ sudo apt install -y phpmyadmin
 if [ $INSTALL_NGINX_INSTEAD == 1 ];
 then
     ##@todo nginx specific settings
-    echo 'Configuration for nginx goes here'
+    echo 'Don/t forget to configure phpmyadmin for nginx'
 fi
 reboot_webserver_helper
 
