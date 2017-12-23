@@ -136,6 +136,8 @@ if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
 
         server_name _;
 
+        client_max_body_size 16M;
+
         location / {
             try_files $uri $uri/ /index.php?$args;
         }
@@ -194,6 +196,8 @@ if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
         index index.php index.html index.htm index.nginx-debian.html;
 
         server_name _;
+
+        client_max_body_size 16M;
 
         location / {
             try_files $uri $uri/ /index.php?$args;
@@ -338,7 +342,11 @@ sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/dbconfig-install boolean 
 sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/app-password-confirm password password"
 sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/admin-pass password password"
 sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/mysql/app-pass password password"
-sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
+if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
+    sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect "
+else
+    sudo debconf-set-selections <<< "phpmyadmin phpmyadmin/reconfigure-webserver multiselect apache2"
+fi
 
 # Use nijel/phpmyadmin ppa to prevent deprecation errors
 sudo add-apt-repository -y ppa:nijel/phpmyadmin
@@ -347,8 +355,50 @@ sudo apt install -y phpmyadmin
 
 if [ $INSTALL_NGINX_INSTEAD == 1 ];
 then
-    ##@todo nginx specific settings
-    echo 'Don/t forget to configure phpmyadmin for nginx'
+    # enable PHPMyAdmin on nginx
+    MY_WEB_CONFIG='server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/public;
+        index index.php index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        client_max_body_size 16M;
+
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        }
+
+        location ~ \.php$ {
+            include snippets/fastcgi-php.conf;
+            fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        }
+
+        location ~ /\.ht {
+            deny all;
+        }
+
+        location /phpmyadmin {
+            root /usr/share/;
+            index index.php;
+            try_files $uri $uri/ =404;
+
+            location ~ ^/phpmyadmin/(doc|sql|setup)/ {
+                deny all;
+            }
+
+            location ~ /phpmyadmin/(.+\.php)$ {
+                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+                include snippets/fastcgi-php.conf;
+            }
+        }
+    }'
+    echo "$MY_WEB_CONFIG" | sudo tee /etc/nginx/sites-available/default
+    sudo systemctl restart nginx
 fi
 reboot_webserver_helper
 
