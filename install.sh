@@ -3,7 +3,7 @@
 # /*=================================
 # =            VARIABLES            =
 # =================================*/
-INSTALL_NGINX_INSTEAD=1
+INSTALL_NGINX_INSTEAD=0
 
 if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
 PROJECT_NAME=bossbox-lemp
@@ -33,6 +33,11 @@ For help, please visit box.jonathanbossenger.com Follow me on Twitter at @jon_bo
 '
 fi
 
+if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
+    PHP_USER_INI_PATH=/etc/php/7.0/fpm/conf.d/user.ini
+else
+    PHP_USER_INI_PATH=/etc/php/7.0/apache2/conf.d/user.ini
+fi
 
 reboot_webserver_helper() {
 
@@ -278,11 +283,6 @@ sudo apt-get -y install php-imagick
 # /*===========================================
 # =            CUSTOM PHP SETTINGS            =
 # ===========================================*/
-if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
-    PHP_USER_INI_PATH=/etc/php/7.0/fpm/conf.d/user.ini
-else
-    PHP_USER_INI_PATH=/etc/php/7.0/apache2/conf.d/user.ini
-fi
 
 echo 'display_startup_errors=On' | sudo tee -a $PHP_USER_INI_PATH
 echo 'display_errors=On' | sudo tee -a $PHP_USER_INI_PATH
@@ -400,6 +400,23 @@ then
     echo "$MY_WEB_CONFIG" | sudo tee /etc/nginx/sites-available/default
     sudo systemctl restart nginx
 fi
+reboot_webserver_helper
+
+
+
+
+
+
+
+# /*=============================
+# =            Xdebug           =
+# =============================*/
+sudo apt-get install -y php-xdebug
+
+echo 'zend_extension="/usr/lib/php/20151012/xdebug.so"' | sudo tee -a $PHP_USER_INI_PATH
+echo 'xdebug.remote_enable=on' | sudo tee -a $PHP_USER_INI_PATH
+echo 'xdebug.remote_connect_back=on' | sudo tee -a $PHP_USER_INI_PATH
+
 reboot_webserver_helper
 
 
