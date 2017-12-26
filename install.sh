@@ -3,7 +3,7 @@
 # /*=================================
 # =            VARIABLES            =
 # =================================*/
-INSTALL_NGINX_INSTEAD=0
+INSTALL_NGINX_INSTEAD=1
 
 if [ $INSTALL_NGINX_INSTEAD == 1 ]; then
 PROJECT_NAME=bossbox-lemp
@@ -52,6 +52,9 @@ reboot_webserver_helper() {
 
     echo 'Rebooting your webserver'
 }
+
+
+
 
 
 
@@ -283,7 +286,6 @@ sudo apt-get -y install php-imagick
 # /*===========================================
 # =            CUSTOM PHP SETTINGS            =
 # ===========================================*/
-
 echo 'display_startup_errors=On' | sudo tee -a $PHP_USER_INI_PATH
 echo 'display_errors=On' | sudo tee -a $PHP_USER_INI_PATH
 echo 'error_reporting=E_ALL' | sudo tee -a $PHP_USER_INI_PATH
